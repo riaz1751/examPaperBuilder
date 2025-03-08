@@ -4,7 +4,7 @@ from config.supabase import supabase
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse("Welcome to the homepage!")
+    return render(request, "home.html")
 
 def signup(request):
     if request.method == "POST":

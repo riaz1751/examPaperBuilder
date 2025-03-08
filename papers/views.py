@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from config.supabase import supabase
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Welcome to the homepage!")
 
 def signup(request):
     if request.method == "POST":

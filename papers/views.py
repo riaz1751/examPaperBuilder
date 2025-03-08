@@ -33,6 +33,14 @@ def login(request):
     return render(request, "auth/login.html")
 
 def dashboard(request):
-    #if "user" not in request.session:
-    #   return redirect("login")
-    return render(request, "auth/dashboard.html")
+    # Check if the user is logged in by checking the session
+    user_id = request.session.get("user")
+    if not user_id:
+        # If no user is logged in, redirect to the login page
+        messages.error(request, "You need to log in first.")
+        return redirect("login")
+    
+    # Fetch user data from Supabase (optional, for personalization)
+    user = supabase.auth.api.get_user(user_id)
+    
+    return render(request, "auth/dashboard.html", {"user": user})

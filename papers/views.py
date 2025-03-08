@@ -31,3 +31,8 @@ def login(request):
             messages.error(request, f"Login failed: {str(e)}")
 
     return render(request, "auth/login.html")
+
+def dashboard(request):
+    #if "user" not in request.session:
+    #   return redirect("login")
+    return render(request, "auth/dashboard.html")

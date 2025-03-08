@@ -12,6 +12,10 @@ def signup(request):
         password = request.POST["password"]
         try:
             response = supabase.auth.sign_up({"email": email, "password": password})
+
+            # Log the response for debugging
+            print(f"Supabase response: {response}")
+            
             messages.success(request, "Account created! Please log in.")
             return redirect("login")
         except Exception as e:

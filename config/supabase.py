@@ -6,15 +6,15 @@ from supabase import create_client
 load_dotenv()
 
 # Log to verify loading
-print("Loading environment variables...")
+# print("Loading environment variables...")
 
 # Get Supabase URL and Key
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Log the values (for debugging only, remove once fixed)
-print("SUPABASE_URL:", SUPABASE_URL)
-print("SUPABASE_KEY:", SUPABASE_KEY)
+# print("SUPABASE_URL:", SUPABASE_URL)
+# print("SUPABASE_KEY:", SUPABASE_KEY)
 
 # Ensure that the environment variables are loaded correctly
 if not SUPABASE_URL or not SUPABASE_KEY:

@@ -44,3 +44,13 @@ def dashboard(request):
     user = supabase.auth.api.get_user(user_id)
     
     return render(request, "auth/dashboard.html", {"user": user})
+
+def logout(request):
+    try:
+        # Log the user out by removing their session data
+        del request.session["user"]
+        messages.success(request, "You have logged out successfully.")
+    except KeyError:
+        pass  # In case there is no session data
+    return redirect("login")  # Redirect to the login page after logging out
+

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Builder</title>
+</head>
+<body>
+    <h1>Exam Paper Builder</h1>
+    
+    <!-- Back to Dashboard Button -->
+    <a href="{% url 'dashboard' %}">
+        <button>Back to Dashboard</button>
+    </a>
+
+    <p>Upload exam papers here to generate a new exam paper.</p>
+
+    <!-- Upload Form (to be implemented later) -->
+    <form action="{% url 'paper_builder' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="exam_papers" multiple accept=".pdf">
+        <button type="submit">Upload</button>
+    </form>
+
+</body>
+</html>

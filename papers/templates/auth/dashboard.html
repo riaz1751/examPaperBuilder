@@ -9,6 +9,9 @@
     <h1>Welcome, {{ user.email }}!</h1>  <!-- Display the user's email -->
     <p>This is your personalized dashboard.</p>
     <div>
+        <a href="{% url 'paper_builder' %}" class="button">Create Paper</a>
+    </div>
+    <div>
         <a href="{% url 'logout' %}" class="button">Log Out</a>
     </div>
     

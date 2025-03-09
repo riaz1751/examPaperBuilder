@@ -67,3 +67,6 @@ def logout(request):
         pass  # In case there is no session data
     return redirect("login")  # Redirect to the login page after logging out
 
+def paper_builder(request):
+    return render(request, "auth/paper_builder.html")
+

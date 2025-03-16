@@ -1,6 +1,7 @@
 import os
 import random
 import PyPDF2
+from fpdf import FPDF
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -87,7 +88,7 @@ def paper_builder(request):
     else:
         form = ExamPaperUploadForm()
 
-    return render(request, "papers/paper_builder.html", {"form": form})
+    return render(request, "auth/paper_builder.html", {"form": form})
 
 def generate_exam_paper(request):
     temp_files = UploadedExamPaper.objects.all()  # Get all uploaded PDFs
@@ -106,7 +107,7 @@ def generate_exam_paper(request):
         os.remove(temp_file.file.path)  # Delete from file system
         temp_file.delete()  # Remove from database
 
-    return render(request, "papers/generated_paper.html", {"new_pdf_path": new_pdf_path})
+    return render(request, "auth/generated_paper.html", {"new_pdf_path": new_pdf_path})
 
 def extract_questions_from_pdfs(pdf_files):
     """
@@ -125,22 +126,20 @@ def extract_questions_from_pdfs(pdf_files):
     return random.sample(all_questions, min(10, len(all_questions)))  # Pick 10 random questions
 
 def create_custom_exam_paper(questions):
-    """
-    Creates a new PDF with selected questions.
-    """
-    from fpdf import FPDF  # Ensure you have installed `fpdf` (`pip install fpdf`)
-
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
+    
+    # Use a font that supports UTF-8 (like Arial Unicode or DejaVu)
+    pdf.add_font("Arial", "", "/Library/Fonts/Arial Unicode.ttf", uni=True)  # Adjust font path if needed
     pdf.set_font("Arial", size=12)
 
     for i, question in enumerate(questions, 1):
         pdf.cell(200, 10, f"Question {i}:", ln=True, align="L")
-        pdf.multi_cell(0, 10, question)
+        pdf.multi_cell(0, 10, question.encode("latin-1", "ignore").decode("latin-1"))  # Encode safely
         pdf.ln(5)
 
     output_path = os.path.join(settings.MEDIA_ROOT, "generated_exam.pdf")
-    pdf.output(output_path)
+    pdf.output(output_path, "F")
 
     return output_path

@@ -1,7 +1,14 @@
+import os
+import random
+import PyPDF2
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from config.supabase import supabase
 from django.http import HttpResponse
+from .forms import ExamPaperUploadForm
+from .models import UploadedExamPaper
+
 
 def home(request):
     return render(request, "home.html")
@@ -70,3 +77,70 @@ def logout(request):
 def paper_builder(request):
     return render(request, "auth/paper_builder.html")
 
+def paper_builder(request):
+    if request.method == "POST":
+        form = ExamPaperUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()  # Saves the file to media/temp/
+            messages.success(request, "PDF uploaded successfully! Now generating exam paper...")
+            return redirect("generate_exam_paper")
+    else:
+        form = ExamPaperUploadForm()
+
+    return render(request, "papers/paper_builder.html", {"form": form})
+
+def generate_exam_paper(request):
+    temp_files = UploadedExamPaper.objects.all()  # Get all uploaded PDFs
+
+    if not temp_files:
+        messages.error(request, "No uploaded PDFs found. Please upload first.")
+        return redirect("paper_builder")
+
+    selected_questions = extract_questions_from_pdfs(temp_files)
+    
+    # Generate new PDF and get file path
+    new_pdf_path = create_custom_exam_paper(selected_questions)
+
+    # Cleanup: Delete the uploaded PDFs
+    for temp_file in temp_files:
+        os.remove(temp_file.file.path)  # Delete from file system
+        temp_file.delete()  # Remove from database
+
+    return render(request, "papers/generated_paper.html", {"new_pdf_path": new_pdf_path})
+
+def extract_questions_from_pdfs(pdf_files):
+    """
+    Extracts questions from all uploaded PDFs and returns a random selection.
+    """
+    all_questions = []
+
+    for pdf in pdf_files:
+        with open(pdf.file.path, "rb") as f:
+            reader = PyPDF2.PdfReader(f)
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    all_questions.append(text)
+
+    return random.sample(all_questions, min(10, len(all_questions)))  # Pick 10 random questions
+
+def create_custom_exam_paper(questions):
+    """
+    Creates a new PDF with selected questions.
+    """
+    from fpdf import FPDF  # Ensure you have installed `fpdf` (`pip install fpdf`)
+
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    for i, question in enumerate(questions, 1):
+        pdf.cell(200, 10, f"Question {i}:", ln=True, align="L")
+        pdf.multi_cell(0, 10, question)
+        pdf.ln(5)
+
+    output_path = os.path.join(settings.MEDIA_ROOT, "generated_exam.pdf")
+    pdf.output(output_path)
+
+    return output_path

@@ -18,9 +18,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from papers.views import home  # Import the home view from the papers app
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),  # Add the home URL pattern for the root
     path('papers/', include('papers.urls')),  # Include the papers app's URL patterns
 ]
+
+if settings.DEBUG:  # Serve media files in development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

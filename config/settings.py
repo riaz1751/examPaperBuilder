@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Media files (uploaded files)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")  # Stores all uploaded files
+
+# Temporary directory for storing PDFs before processing
+TEMP_UPLOAD_DIR = os.path.join(MEDIA_ROOT, "temp/")
+
+# Ensure the temp folder exists
+os.makedirs(TEMP_UPLOAD_DIR, exist_ok=True)
 
 # Application definition
 

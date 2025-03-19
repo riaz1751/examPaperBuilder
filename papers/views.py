@@ -9,6 +9,7 @@ from config.supabase import supabase
 from django.http import HttpResponse
 from .forms import ExamPaperUploadForm
 from .models import UploadedExamPaper
+from django.http import FileResponse
 
 
 def home(request):
@@ -143,3 +144,16 @@ def create_custom_exam_paper(questions):
     pdf.output(output_path, "F")
 
     return output_path
+
+def download_exam_paper(request):
+    pdf_path = os.path.join(settings.MEDIA_ROOT, "generated_exam.pdf")
+
+    # Ensure the file exists before serving
+    if not os.path.exists(pdf_path):
+        messages.error(request, "The exam paper could not be found.")
+        return redirect("exam_paper_builder")
+
+    # Serve the file as a response
+    response = FileResponse(open(pdf_path, "rb"), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="custom_exam_paper.pdf"'
+    return response
